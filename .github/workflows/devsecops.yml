@@ -7,6 +7,9 @@ on:
   pull_request:
     branches: [ "master", "main" ]
 
+permissions:
+  issues: 
+  
 jobs: 
   SCA-Dependency-Check:
     name: OWASP Dependency Check (SCA)
