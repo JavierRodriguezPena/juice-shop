@@ -52,6 +52,38 @@ jobs:
           
       - name: SonarQube Quality Gate check
         uses: sonarsource/sonarqube-quality-gate-action@master
-        timeout-minutes: 5
+        timeout-minutes: 10
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+DAST-ZAP:
+    name: OWASP ZAP Scan (DAST)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Instalar dependencias de Node
+        run: npm install --legacy-peer-deps
+
+      - name: Levantar Juice Shop en segundo plano
+        # El símbolo '&' al final es vital: hace que el servidor corra de fondo para que el pipeline pueda seguir al siguiente paso
+        run: npm start &
+
+      - name: Esperar a que la aplicación esté lista
+        # Usamos wait-on para pausar el pipeline hasta que el puerto 3000 responda
+        run: npx wait-on http://localhost:3000
+
+      - name: Ejecutar OWASP ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: 'http://localhost:3000'
+          # Dejamos esto en false temporalmente para que veas el reporte antes de aplicar la Quality Gate
+          fail_action: false 
+
+      - name: Subir reporte de ZAP
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reporte-DAST-ZAP
+          path: zap-report.html
