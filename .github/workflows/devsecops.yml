@@ -56,7 +56,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-DAST-ZAP:
+  DAST-ZAP:
     name: OWASP ZAP Scan (DAST)
     runs-on: ubuntu-latest
     steps:
