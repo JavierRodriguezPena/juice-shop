@@ -81,7 +81,7 @@ jobs:
         uses: zaproxy/action-baseline@v0.12.0
         with:
           target: 'http://localhost:3000'
-          artifact_name: 'reporte-ZAP'
+          artifact_name: 'reporte-zap'
           # Dejamos esto en false temporalmente para que veas el reporte antes de aplicar la Quality Gate
           fail_action: false 
 
