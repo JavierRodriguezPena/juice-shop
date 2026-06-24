@@ -89,4 +89,4 @@ jobs:
         if: always()
         with:
           name: reporte-DAST-ZAP
-          path: zap-report.html
+          path: report_html.html
