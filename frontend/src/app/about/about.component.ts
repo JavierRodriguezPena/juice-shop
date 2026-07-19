@@ -4,7 +4,7 @@
  */
 
 import { Component, type OnInit, inject } from '@angular/core'
-import { DomSanitizer } from '@angular/platform-browser'
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 import { ConfigurationService } from '../Services/configuration.service'
 import { FeedbackService } from '../Services/feedback.service'
 import { Gallery, type GalleryRef, GalleryComponent, GalleryImageDef } from 'ng-gallery'
@@ -62,7 +62,7 @@ export class AboutComponent implements OnInit {
     '<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>'
   ]
 
-  ngOnInit (): void {
+  ngOnInit(): void {
     this.galleryRef = this.gallery.ref('feedback-gallery')
     this.populateSlideshowFromFeedbacks()
     this.configurationService.getApplicationConfiguration()
@@ -101,7 +101,7 @@ export class AboutComponent implements OnInit {
       })
   }
 
-  populateSlideshowFromFeedbacks () {
+  populateSlideshowFromFeedbacks() {
     this.feedbackService
       .find()
       .pipe(
@@ -113,18 +113,24 @@ export class AboutComponent implements OnInit {
       .subscribe((feedbacks) => {
         for (let i = 0; i < feedbacks.length; i++) {
 
-          feedbacks[i].comment = `<figcaption><p class="feedback-comment">${
-            feedbacks[i].comment
-          }</p><div class="feedback-stars">(${this.stars[feedbacks[i].rating]})</div></figcaption>`
+          feedbacks[i].comment = `<figcaption><p class="feedback-comment">${feedbacks[i].comment
+            }</p><div class="feedback-stars">(${this.stars[feedbacks[i].rating]})</div></figcaption>`
           feedbacks[i].comment = this.sanitizer.bypassSecurityTrustHtml(
             feedbacks[i].comment
           )
 
           this.galleryRef.addImage({
             src: this.images[i % this.images.length],
-            args: feedbacks[i].comment
-          })
+            args: {
+              comment: feedbacks[i].comment,
+              rating: feedbacks[i].rating
+            }
+          });
         }
       })
+  }
+    getStars(rating: number): SafeHtml {
+    const starsHtml = this.stars[rating] ?? '';
+    return this.sanitizer.bypassSecurityTrustHtml(starsHtml);
   }
 }
